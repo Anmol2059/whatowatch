@@ -3,3 +3,58 @@
 #393E46
 #00ADB5
 #EEEEEE */
+
+:root {
+    --dark: #222831;
+    --grey: #393E46;
+    --blue: #00ADB5;
+    --light: #EEEEEE;
+}
+
+.back-dark{
+    background-color: var(--dark);
+}
+
+.back-grey{
+    background-color: var(--grey);
+}
+
+.back-blue{
+    background-color: var(--blue);
+}
+
+.back-light{
+    background-color: var(--light);
+}
+
+.color-dark{
+    color: var(--dark);
+}
+
+.color-grey{
+    color: var(--grey);
+}
+
+.color-blue{
+    color: var(--blue);
+}
+
+.color-light{
+    color: var(--light);
+}
+
+.border-dark{
+    border-color: var(--dark);
+}
+
+.border-grey{
+    border-color: var(--grey);
+}
+
+.border-blue{
+    border-color: var(--blue);
+}
+
+.border-light{
+    border-color: var(--light);
+}
