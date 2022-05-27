@@ -58,3 +58,7 @@
 .border-light{
     border-color: var(--light);
 }
+
+.contact-logo{
+    width: 25px;
+}
