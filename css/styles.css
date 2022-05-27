@@ -9,6 +9,7 @@
     --grey: #393E46;
     --blue: #00ADB5;
     --light: #EEEEEE;
+    --transparent-dark: rgba(34, 40, 49, 0.8);
 }
 
 .back-dark{
@@ -61,4 +62,8 @@
 
 .contact-logo{
     width: 25px;
+}
+
+.nav-transparent{
+    background: var(--transparent-dark);
 }
