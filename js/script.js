@@ -81,7 +81,7 @@ document.body.onkeyup = function(e){
     if(e.keyCode == 32){
         var movie = pad(Math.floor((Math.random() * 1155529) + 1), 7);
             $("#refresh").text("Generating...").prop("disabled", true);
-            $.getJSON("http://www.omdbapi.com/?apikey=75892e41&i=tt"+movie, function(data) {
+            $.getJSON("https://www.omdbapi.com/?apikey=75892e41&i=tt"+movie, function(data) {
             var title = data.Title;
             var year = data.Year;
             var rating = data.imdbRating;
