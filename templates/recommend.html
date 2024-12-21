@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="recommend-section">
+    <h1 class="recommend-title">Movie Recommendations</h1>
+    <form method="POST" class="recommend-form" id="recommendForm">
+        <div class="recommend-search-container">
+            <label for="movie_name" class="recommend-label">Select a Movie:</label>
+            <div class="search-wrapper">
+                <input list="movies" name="movie_name" id="movie_name" class="recommend-textbox" placeholder="Start typing a movie name..." required>
+                <datalist id="movies">
+                    {% for movie in movies %}
+                    <option value="{{ movie }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+            <button type="submit" class="recommend-button" id="recommendButton">
+                <span class="button-text">Recommend</span>
+                <div class="button-loader hidden"></div>
+            </button>
+        </div>
+    </form>
+
+    <div id="loadingMessage" class="recommend-loading hidden">
+        <div class="loading-animation">
+            <div class="loader"></div>
+        </div>
+        <div class="loading-messages">
+            <p class="loading-message active">🎬 Analyzing your movie preferences...</p>
+            <p class="loading-message">🎥 Curating the perfect recommendations...</p>
+            <p class="loading-message">🍿 Almost ready for your movie journey...</p>
+        </div>
+    </div>
+
+    {% if not recommendations and movie_name %}
+    <div class="no-results">
+        <div class="no-results-icon">🎭</div>
+        <h2 class="no-results-title">No Movies Found</h2>
+        <p class="no-results-message">We couldn't find any recommendations for "{{ movie_name }}". Please try another movie!</p>
+    </div>
+    {% endif %}
+
+    {% if recommendations %}
+    <div class="recommend-results">
+        <h2 class="recommend-subtitle">Recommendations for "{{ movie_name }}"</h2>
+        {% for key, (movies, posters) in recommendations.items() %}
+        <div class="category-container">
+            <h3 class="category-title">Recommendations Based on {{ key|capitalize }}</h3>
+            <div class="movie-grid">
+                {% for movie, poster in zip(movies, posters) %}
+                <div class="movie-card">
+                    <div class="poster-wrapper">
+                        <img src="{{ poster }}" alt="{{ movie }}" class="movie-poster" loading="lazy">
+                        <div class="poster-overlay">
+                            <p class="movie-title">{{ movie }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recommendForm');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const button = document.getElementById('recommendButton');
+    const buttonText = button.querySelector('.button-text');
+    const buttonLoader = button.querySelector('.button-loader');
+    const loadingMessages = document.querySelectorAll('.loading-messages .loading-message');
+    let currentMessage = 0;
+
+    function rotateLoadingMessages() {
+        loadingMessages.forEach(msg => msg.classList.remove('active'));
+        loadingMessages[currentMessage].classList.add('active');
+        currentMessage = (currentMessage + 1) % loadingMessages.length;
+    }
+
+    form.addEventListener('submit', function(e) {
+        buttonText.classList.add('hidden');
+        buttonLoader.classList.remove('hidden');
+        loadingMessage.classList.remove('hidden');
+        currentMessage = 0;
+        rotateLoadingMessages();
+
+        const messageInterval = setInterval(rotateLoadingMessages, 6000);
+        
+        // Clean up interval after reasonable timeout
+        setTimeout(() => {
+            clearInterval(messageInterval);
+        }, 30000);
+    });
+});
+</script>
+{% endblock %}

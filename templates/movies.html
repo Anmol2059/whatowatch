@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>All Movies</h1>
+<ul>
+    {% for _, movie in movies.iterrows() %}
+    <li>
+        <img src="{{ fetch_posters(movie['movie_id']) }}" alt="{{ movie['title'] }}" width="100">
+        <p>{{ movie['title'] }}</p>
+    </li>
+    {% endfor %}
+</ul>
+<form method="POST">
+    <button type="submit" name="page_number" value="{{ page_number - 1 }}">Previous</button>
+    <button type="submit" name="page_number" value="{{ page_number + 1 }}">Next</button>
+</form>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ movie_name }}</h1>
+<img src="{{ info[0] }}" alt="{{ movie_name }}" width="200">
+<p>{{ info[3] }}</p>
+<!-- Add additional movie details here -->
+{% endblock %}
