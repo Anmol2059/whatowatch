@@ -1,18 +1,5 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="home-container">
-    <div class="home-hero">
-        <h1 class="home-title">Movie Recommendation System</h1>
-        <p class="home-subtitle">Your personal guide to discovering the best movies!</p>
-    </div>
-    
-    <div class="home-description">
-        <p>Discover movies tailored to your tastes! Explore curated recommendations, browse the complete movie list, and dive into detailed descriptions of your favorite films.</p>
-        <div class="home-buttons">
-            <a href="{{ url_for('recommend') }}" class="home-button">Get Recommendations</a>
-            <a href="{{ url_for('movies_page') }}" class="home-button">Browse All Movies</a>
-        </div>
-    </div>
-</div>
+
 {% endblock %}

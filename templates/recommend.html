@@ -28,7 +28,17 @@
         <div class="loading-messages">
             <p class="loading-message active">🎬 Analyzing your movie preferences...</p>
             <p class="loading-message">🎥 Curating the perfect recommendations...</p>
+            <p class="loading-message">🎞️ Generating Movies Recommendations Based on : Tags </p>
+            <p class="loading-message">🎞️ Generating Movies Recommendations Based on : Genres </p>
+            <p class="loading-message">🎞️ Generating Movies Recommendations Based on : Production </p>
+            <p class="loading-message">🎞️ Generating Movies Recommendations Based on : Keywords </p>
+            <p class="loading-message">🎞️ Generating Movies Recommendations Based on : Cast </p>
             <p class="loading-message">🍿 Almost ready for your movie journey...</p>
+            <p class="loading-message">🍿 Grab your popcorn, recommendations are ready!</p>
+            <p class="loading-message">😔 Sorrryyyy, it's our server not you, we hate to make you wait !</p>
+            <p class="loading-message">🎬 I am telling you, it's worth the wait.</p>
+            
+
         </div>
     </div>
 
@@ -42,6 +52,10 @@
 
     {% if recommendations %}
     <div class="recommend-results">
+        <!-- want to know more about this movie click here for describe page -->
+        
+        <h4>Click <a href="/describe" class="describe-link">🎬 {{ movie_name }}</a> to Know about the details of this movie: </h4>
+
         <h2 class="recommend-subtitle">Recommendations for "{{ movie_name }}"</h2>
         {% for key, (movies, posters) in recommendations.items() %}
         <div class="category-container">
@@ -87,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentMessage = 0;
         rotateLoadingMessages();
 
-        const messageInterval = setInterval(rotateLoadingMessages, 6000);
+        const messageInterval = setInterval(rotateLoadingMessages, 4000);
         
         // Clean up interval after reasonable timeout
         setTimeout(() => {

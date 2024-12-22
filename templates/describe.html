@@ -1,8 +1,46 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ movie_name }}</h1>
-<img src="{{ info[0] }}" alt="{{ movie_name }}" width="200">
-<p>{{ info[3] }}</p>
-<!-- Add additional movie details here -->
+<div class="describe-container">
+    <div class="describe-header">
+        <h1 class="describe-title">🎬 {{ movie_name }}</h1>
+    </div>
+    <div class="describe-details">
+        <div class="describe-image">
+            <img src="{{ info[0] }}" alt="{{ movie_name }}" class="describe-poster">
+        </div>
+        <div class="describe-info">
+            <p class="describe-overview">📜 <strong>Overview:</strong> {{ info[3] }}</p>
+            <ul class="describe-meta">
+                <li>⭐ <strong>Rating:</strong> {{ info[8] }}</li>
+                <li>👥 <strong>No. of Ratings:</strong> {{ info[9] }}</li>
+                <li>⏳ <strong>Runtime:</strong> {{ info[6] }}</li>
+                <li>📅 <strong>Release Date:</strong> {{ info[4] }}</li>
+                <li>💰 <strong>Budget:</strong> ${{ "{:,}".format(info[1]) }}</li>
+                <li>🏆 <strong>Revenue:</strong> ${{ "{:,}".format(info[5]) }}</li>
+                <li>🎭 <strong>Genres:</strong> {{ info[2] | join(', ') }}</li>
+                <li>🌍 <strong>Available in:</strong> {{ info[13] | join(', ') }}</li>
+                <li>🎥 <strong>Directed by:</strong> {{ info[12][0] }}</li>
+            </ul>
+        </div>
+    </div>
+    <br>
+    <hr>
+
+    <div class="describe-cast">
+        <h2>🎭 Cast</h2>
+        {% if cast %}
+        <div class="describe-cast-grid">
+            {% for url, bio in cast %}
+            <div class="cast-card">
+                <img src="{{ url }}" alt="Cast Image" class="cast-image">
+                <!-- <p class="cast-bio">{{ bio }}</p> -->
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No cast information available for this movie.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

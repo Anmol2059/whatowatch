@@ -41,8 +41,28 @@ def describe():
     if not selected_movie_name:
         return redirect(url_for('index'))
 
+    # Fetch movie details
     info = preprocess.get_details(selected_movie_name)
-    return render_template('describe.html', movie_name=selected_movie_name, info=info)
+
+    # Prepare cast information
+    cast = []
+    if len(info[14]) > 0:  # Ensure there are cast members
+        for cast_id in info[14][:5]:  # Limit to top 5 cast members
+            try:
+                url, biography = preprocess.fetch_person_details(cast_id)
+                cast.append((url, biography))
+            except Exception as e:
+                print(f"Error fetching cast details for ID {cast_id}: {e}")
+    else:
+        print("No cast information available.")
+
+    # Pass all required data to the template
+    return render_template(
+        'describe.html',
+        movie_name=selected_movie_name,
+        info=info,
+        cast=cast
+    )
 
 
 @app.route('/movies', methods=['GET', 'POST'])

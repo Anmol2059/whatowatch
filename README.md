@@ -1,4 +1,4 @@
 first
 pip install requirements.txt
-streamlit run app.py
-then flask app
+
+then only run flask app
