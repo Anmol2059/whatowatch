@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Recommender</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- tailwind cdn -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Navigation Bar */
         nav {
@@ -16,15 +18,38 @@
             color: white;
         }
 
+        nav .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
         nav a {
             color: white;
             text-decoration: none;
-            margin: 0 1rem;
-            transition: color 0.3s;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         nav a:hover {
             color: #90cdf4;
+        }
+
+        /* Underline animation for nav links */
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #90cdf4;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
         }
 
         nav .user-section {
@@ -36,6 +61,9 @@
         nav .username {
             font-size: 0.9rem;
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         nav .logout-button {
@@ -44,12 +72,13 @@
             border-radius: 4px;
             text-decoration: none;
             color: white;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             font-size: 0.9rem;
         }
 
         nav .logout-button:hover {
             background-color: #c53030;
+            transform: translateY(-1px);
         }
 
         /* Footer */
@@ -57,27 +86,59 @@
             text-align: center;
             background-color: #2d3748;
             color: white;
-            padding: 1rem;
+            padding: 1.5rem;
             margin-top: 2rem;
         }
 
         footer p {
             margin: 0;
             font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        footer p:first-child {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem 0.5rem;
+            }
+
+            nav .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            nav .user-section {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav>
-        <div>
+        <div class="nav-links">
             <a href="{{ url_for('home') }}">Home</a>
             <a href="{{ url_for('recommend') }}">Recommend</a>
+            <a href="{{ url_for('filter') }}">Filter</a>
             <a href="{{ url_for('describe') }}">Describe</a>
             <a href="{{ url_for('movies_page') }}">Movies</a>
         </div>
         <div class="user-section">
-            <span class="username">👋 {{ session['username'] }}</span>
+            <span class="username">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {{ session['username'] }}
+            </span>
             <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
         </div>
     </nav>
@@ -89,7 +150,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>© anmol guragain</p>
+        <p>© 2024 anmol guragain</p>
         <p>Movie Recommendation App</p>
     </footer>
 </body>

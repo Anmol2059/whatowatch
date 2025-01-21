@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">Discover Movies</h1>
+
+    <form id="filterForm" class="space-y-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Genre Filter -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Genres</label>
+                <select id="genreSelect" multiple 
+                        class="h-60 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    {% for genre in genres %}
+                        <option value="{{ genre }}" class="p-2">{{ genre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Cast Filter -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Cast</label>
+                <select id="castSelect" multiple 
+                        class="h-60 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    {% for actor in actors %}
+                        <option value="{{ actor }}" class="p-2">{{ actor }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Keywords Filter -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Keywords</label>
+                <select id="keywordSelect" multiple 
+                        class="h-60 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    {% for keyword in keywords %}
+                        <option value="{{ keyword }}" class="p-2">{{ keyword }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Selected Filters Display -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Selected Genres</h3>
+                <div id="selectedGenres" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Selected Cast</h3>
+                <div id="selectedCast" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Selected Keywords</h3>
+                <div id="selectedKeywords" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-4">
+            <button type="submit" 
+                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Find Movies
+            </button>
+            <button type="button" id="clearFilters"
+                    class="px-6 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Clear All
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Loading State -->
+<div id="loadingState" class="hidden flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg shadow-md">
+    <div class="animate-spin rounded-full h-14 w-14 border-4 border-indigo-600 border-t-transparent"></div>
+    <p class="mt-4 text-gray-700 text-lg font-medium">Finding movies...</p>
+</div>
+
+<!-- Results Grid -->
+<div id="movieResults" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-8">
+    <!-- Movie cards will dynamically populate here -->
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('filterForm');
+    const selects = {
+        genre: document.getElementById('genreSelect'),
+        cast: document.getElementById('castSelect'),
+        keyword: document.getElementById('keywordSelect')
+    };
+    const selectedContainers = {
+        genre: document.getElementById('selectedGenres'),
+        cast: document.getElementById('selectedCast'),
+        keyword: document.getElementById('selectedKeywords')
+    };
+
+    // Enable multiple selection with Ctrl/Cmd key
+    Object.values(selects).forEach(select => {
+        select.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            
+            const option = e.target;
+            if (option.tagName === 'OPTION') {
+                option.selected = !option.selected;
+                const type = this.id.replace('Select', '');
+                updateSelectedDisplay(type);
+            }
+        });
+    });
+
+    // Update selected items display
+    function updateSelectedDisplay(type) {
+        const select = selects[type];
+        const container = selectedContainers[type];
+        const selectedOptions = Array.from(select.selectedOptions);
+
+        container.innerHTML = selectedOptions.map(option => `
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800">
+                ${option.value}
+                <button type="button" class="ml-2 text-indigo-600 hover:text-indigo-900" 
+                        data-type="${type}" data-value="${option.value}">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </span>
+        `).join('');
+
+        // Add click handlers for remove buttons
+        container.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const type = e.currentTarget.dataset.type;
+                const value = e.currentTarget.dataset.value;
+                
+                Array.from(selects[type].options).forEach(option => {
+                    if (option.value === value) {
+                        option.selected = false;
+                    }
+                });
+                
+                updateSelectedDisplay(type);
+            });
+        });
+    }
+
+    // Clear filters button
+    document.getElementById('clearFilters').addEventListener('click', () => {
+        Object.values(selects).forEach(select => {
+            Array.from(select.options).forEach(option => option.selected = false);
+        });
+        Object.keys(selectedContainers).forEach(type => {
+            selectedContainers[type].innerHTML = '';
+        });
+    });
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const loadingState = document.getElementById('loadingState');
+        const movieResults = document.getElementById('movieResults');
+        
+        loadingState.classList.remove('hidden');
+        movieResults.innerHTML = '';
+
+        const filters = {
+            genre: Array.from(selects.genre.selectedOptions).map(opt => opt.value),
+            cast: Array.from(selects.cast.selectedOptions).map(opt => opt.value),
+            keyword: Array.from(selects.keyword.selectedOptions).map(opt => opt.value)
+        };
+
+        try {
+            const response = await fetch('/api/filter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(filters)
+            });
+
+            const movies = await response.json();
+            
+            if (movies.length === 0) {
+                movieResults.innerHTML = `
+                    <div class="col-span-full text-center text-gray-500 py-8">
+                        No movies found matching your criteria
+                    </div>
+                `;
+                return;
+            }
+
+            movieResults.innerHTML = movies.map(movie => `
+                <div class="group relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <img src="${movie.poster}" alt="${movie.title}" 
+                         class="w-full aspect-[2/3] object-cover"
+                         loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="absolute bottom-0 p-4 text-white">
+                            <h3 class="font-semibold">${movie.title}</h3>
+                            <p class="text-sm opacity-90">${movie.release_date?.split('-')[0] || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error fetching results:', error);
+            movieResults.innerHTML = `
+                <div class="col-span-full text-center text-red-500 py-8">
+                    Error loading movies. Please try again.
+                </div>
+            `;
+        } finally {
+            loadingState.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}

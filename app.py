@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from processing import preprocess
 from processing.display import Main
 import os
@@ -146,6 +146,80 @@ def movies_page():
     movie_list = movies.iloc[start:start + 10]
     return render_template('movies.html', movies=movie_list, page_number=page_number, fetch_posters=preprocess.fetch_posters)
 
+
+@app.route('/filter')
+def filter():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+        
+    global new_df
+    genres = set()
+    cast = set()
+    keywords = set()
+    
+    # Extract individual items
+    for genre_list in new_df['genres'].dropna():
+        if isinstance(genre_list, str):
+            genres.update(genre.strip() for genre in genre_list.split())
+            
+    if 'tcast' in new_df.columns:
+        for cast_list in new_df['tcast'].dropna():
+            if isinstance(cast_list, str):
+                cast.update(actor.strip() for actor in cast_list.split())
+                
+    for keyword_list in new_df['keywords'].dropna():
+        if isinstance(keyword_list, str):
+            keywords.update(keyword.strip() for keyword in keyword_list.split())
+    
+    # Remove empty strings and sort
+    genres = sorted([g for g in genres if g])
+    cast = sorted([c for c in cast if c])
+    keywords = sorted([k for k in keywords if k])
+    
+    return render_template('filter.html', 
+                         genres=genres,
+                         actors=cast,
+                         keywords=keywords)
+
+@app.route('/api/filter', methods=['POST'])
+def apply_filters():
+    if 'username' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    
+    global new_df
+    filters = request.json
+    filtered_df = new_df.copy()
+    
+    for filter_type, values in filters.items():
+        if not values:  # Skip empty filters
+            continue
+            
+        if filter_type == 'genre':
+            mask = filtered_df['genres'].apply(
+                lambda x: any(genre in str(x).lower() for genre in [v.lower() for v in values])
+            )
+            filtered_df = filtered_df[mask]
+            
+        elif filter_type == 'cast':
+            mask = filtered_df['tcast'].apply(
+                lambda x: any(actor in str(x).lower() for actor in [v.lower() for v in values])
+            )
+            filtered_df = filtered_df[mask]
+            
+        elif filter_type == 'keyword':
+            mask = filtered_df['keywords'].apply(
+                lambda x: any(keyword in str(x).lower() for keyword in [v.lower() for v in values])
+            )
+            filtered_df = filtered_df[mask]
+    
+    results = filtered_df.head(20).to_dict('records')
+    for movie in results:
+        movie['poster'] = preprocess.fetch_posters(movie['movie_id'])
+        if 'release_date' not in movie:
+            movie['release_date'] = ''
+    
+    return jsonify(results)
+    
 if __name__ == '__main__':
     with Main() as bot:
         bot.main_()
